@@ -1,5 +1,7 @@
 import { utils } from "./utils.js";
 import { TextMessage } from "./TextMessage.js";
+import { Battle } from "./Battle.js";
+import { Storage } from "./Storage.js";
 
 export class OverworldEvent {
   constructor({ map, event}) {
@@ -60,6 +62,25 @@ export class OverworldEvent {
       onComplete: () => resolve()
     })
     message.init( document.querySelector(".game-container") )
+  }
+
+  battle(resolve) {
+    if (Storage.isDefeated(this.event.enemyId)) {
+      resolve();
+      return;
+    }
+
+    const battle = new Battle({
+      playerId: "hero",
+      enemyId: this.event.enemyId,
+      onComplete: (didWin) => {
+        if (didWin) {
+          Storage.markDefeated(this.event.enemyId);
+        }
+        resolve();
+      }
+    })
+    battle.init( document.querySelector(".game-container") )
   }
 
   init() {

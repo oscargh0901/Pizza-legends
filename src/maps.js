@@ -1,6 +1,9 @@
 import { utils } from "./utils.js";
 import { GameObject } from "./GameObject.js";
 import { Person } from "./Person.js";
+import { Storage } from "./Storage.js";
+
+const savedHeroPosition = Storage.getHeroPosition();
 
 export const OverworldMaps = {
   DemoRoom: {
@@ -9,8 +12,8 @@ export const OverworldMaps = {
     gameObjects: {
       hero: new Person({
         isPlayerControlled: true,
-        x: utils.withGrid(5),
-        y: utils.withGrid(6),
+        x: savedHeroPosition ? savedHeroPosition.x : utils.withGrid(5),
+        y: savedHeroPosition ? savedHeroPosition.y : utils.withGrid(6),
       }),
       npcA: new Person({
         x: utils.withGrid(7),
@@ -42,6 +45,20 @@ export const OverworldMaps = {
           { type: "walk",  direction: "up" },
           { type: "walk",  direction: "right" },
           { type: "walk",  direction: "down" },
+        ]
+      }),
+      npcC: new Person({
+        x: utils.withGrid(5),
+        y: utils.withGrid(9),
+        src: "/images/characters/people/npc3.png",
+        talking: [
+          {
+            events: [
+              { type: "textMessage", text: "I challenge you to a pizza battle!", faceHero: "npcC" },
+              { type: "battle", enemyId: "npcC" },
+              { type: "textMessage", text: "Until next time!" },
+            ]
+          }
         ]
       }),
     },

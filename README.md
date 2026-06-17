@@ -2,7 +2,11 @@
 
 Prototipo de un RPG estilo Pokémon (vista cenital, movimiento por cuadrícula, NPCs, diálogos) hecho en JavaScript vanilla + Canvas 2D.
 
-Ver [`AGENT.md`](./AGENT.md) para un escaneo completo del proyecto: arquitectura, bugs conocidos, mejoras pendientes y proyección de negocio.
+Ver [`CLAUDE.md`](./CLAUDE.md) para un escaneo completo del proyecto: arquitectura, bugs conocidos, mejoras pendientes y proyección de negocio.
+
+## Origen
+
+Este proyecto parte de la serie tutorial de [Drew Conley](https://www.youtube.com/@drewconley) en YouTube, donde construye un RPG estilo Pokémon en JavaScript vanilla. A partir de esa base añadí: sistema de batallas por turnos con tabla de tipos (`Battle.js`/`Combatant.js`/`pizzas.js`), persistencia de progreso en `localStorage` (`Storage.js`), una suite de tests E2E con Playwright, migración a Vite + módulos ES, y varios bugs corregidos (detalle en [`CLAUDE.md`](./CLAUDE.md)).
 
 ## Requisitos
 
@@ -24,6 +28,17 @@ npm run build
 npm run preview
 ```
 
+## Tests
+
+Hay un test end-to-end (Playwright) que juega la partida real en un navegador headless: mueve al héroe, habla con el NPC retador, pelea la batalla y comprueba el resultado.
+
+```bash
+npx playwright install chromium   # solo la primera vez
+npm run test:e2e
+```
+
+El test arranca el dev server automáticamente (no hace falta tener `npm run dev` corriendo a la vez).
+
 ## Estructura
 
 ```
@@ -36,6 +51,8 @@ src/               Código del motor (módulos ES)
   GameObject.js / Person.js   Entidades del juego
   Sprite.js         Animación de sprites
   OverworldEvent.js / TextMessage.js   Cutscenes y diálogos
+  Battle.js / Combatant.js / pizzas.js   Sistema de batallas por turnos
+  Storage.js        Persistencia en localStorage (posición del héroe, enemigos derrotados)
   DirectionInput.js / KeyPressListener.js   Entrada de teclado
   utils.js          Helpers de cuadrícula y eventos
 public/             Assets estáticos servidos tal cual (imágenes, CSS)
@@ -44,4 +61,4 @@ public/             Assets estáticos servidos tal cual (imágenes, CSS)
 ## Controles
 
 - Flechas / WASD: moverse
-- Enter: hablar con un NPC / avanzar diálogo
+- Enter: hablar con un NPC / avanzar diálogo / luchar (al hablar con el NPC retador)

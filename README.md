@@ -24,6 +24,17 @@ npm run build
 npm run preview
 ```
 
+## Tests
+
+Hay un test end-to-end (Playwright) que juega la partida real en un navegador headless: mueve al héroe, habla con el NPC retador, pelea la batalla y comprueba el resultado.
+
+```bash
+npx playwright install chromium   # solo la primera vez
+npm run test:e2e
+```
+
+El test arranca el dev server automáticamente (no hace falta tener `npm run dev` corriendo a la vez).
+
 ## Estructura
 
 ```

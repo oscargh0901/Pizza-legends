@@ -4,6 +4,10 @@ Prototipo de un RPG estilo Pokémon (vista cenital, movimiento por cuadrícula, 
 
 Ver [`AGENT.md`](./AGENT.md) para un escaneo completo del proyecto: arquitectura, bugs conocidos, mejoras pendientes y proyección de negocio.
 
+## Origen
+
+Este proyecto parte de la serie tutorial de [Drew Conley](https://www.youtube.com/@drewconley) en YouTube, donde construye un RPG estilo Pokémon en JavaScript vanilla. A partir de esa base añadí: sistema de batallas por turnos con tabla de tipos (`Battle.js`/`Combatant.js`/`pizzas.js`), persistencia de progreso en `localStorage` (`Storage.js`), una suite de tests E2E con Playwright, migración a Vite + módulos ES, y varios bugs corregidos (detalle en [`AGENT.md`](./AGENT.md)).
+
 ## Requisitos
 
 - Node.js 18+

@@ -104,11 +104,11 @@ playwright.config.js   → arranca el dev server y configura el navegador para e
 
 ## 6. Origen del proyecto y originalidad (importante)
 
-La estructura de clases (`Overworld`, `OverworldMap`, `OverworldEvent`, `GameObject`, `Person`, `Sprite`, `DirectionInput`, `KeyPressListener`, `TextMessage`), los nombres de mapas (`DemoRoom`, `Kitchen`, `PizzaShop`, `Street`...) y los assets (iconos de tipos de pizza, displays de batalla) coinciden con la serie tutorial pública **"Pizza Legends"** (curso de creación de un RPG estilo Pokémon en JS vanilla). Es decir: el código actual es, en gran parte, una **transcripción del tutorial**, no una base original.
+La estructura de clases (`Overworld`, `OverworldMap`, `OverworldEvent`, `GameObject`, `Person`, `Sprite`, `DirectionInput`, `KeyPressListener`, `TextMessage`), los nombres de mapas (`DemoRoom`, `Kitchen`, `PizzaShop`, `Street`...) y los assets (iconos de tipos de pizza, displays de batalla) coinciden con la serie tutorial pública **"Pizza Legends" de Drew Conley** (YouTube), un curso público de creación de un RPG estilo Pokémon en JS vanilla. Es decir: el código base es, en gran parte, una **transcripción del tutorial**, no una base original.
 
-Si la intención es:
-- **Aprender / portfolio personal** → no hay problema legal, pero conviene indicarlo explícitamente (ej. en el README: "proyecto de aprendizaje basado en el tutorial X") y, ya que se quiere usar como portfolio, sería bueno **añadir alguna mecánica propia** que demuestre criterio (ej. el propio sistema de batallas, que el tutorial probablemente no cubre en este punto).
-- **Publicar o monetizar el juego** → hay que sustituir el arte (sprites, mapas, iconos) por arte propio o con licencia adecuada, y renombrar/refactorizar lo suficiente para que no sea una copia 1:1 del código del tutorial. El nombre "Pizza Legends" también podría estar ligado al tutorial original; conviene verificar/cambiarlo si se busca una marca propia.
+**Decisión tomada:** el objetivo de este repo es portfolio personal (no publicar/monetizar el juego como producto), así que no hace falta sustituir arte ni renombrar nada. Se añadió una sección "Origen" en el `README.md` que acredita el tutorial de Drew Conley explícitamente y enumera lo añadido sobre esa base (sistema de batallas, persistencia, tests E2E, migración a Vite, bugs corregidos) — eso es justo lo que aporta valor de cara a un reclutador: ser transparente sobre el punto de partida y mostrar qué se construyó encima.
+
+Si en el futuro la intención cambia a **publicar o monetizar el juego**, entonces sí habría que sustituir el arte (sprites, mapas, iconos) por arte propio o con licencia adecuada, y renombrar/refactorizar lo suficiente para que no sea una copia 1:1 del tutorial — el nombre "Pizza Legends" también está ligado al original y habría que cambiarlo.
 
 ## 7. Proyección de negocio
 
@@ -129,7 +129,7 @@ Caminos razonables si se decide invertir tiempo en convertirlo en algo con poten
 - [x] Añadir `package.json`, bundler (Vite) y módulos ES
 - [x] Añadir `README.md` con instrucciones de ejecución
 - [x] Separar datos de mapas de la lógica del motor
-- [ ] Decidir y documentar licencia / originalidad del arte y nombre
+- [x] Decidir y documentar licencia / originalidad del arte y nombre (ver sección 6: portfolio + atribución en README, sin sustituir arte)
 - [x] Implementar sistema de batallas (versión básica 1 vs 1, ver sección 10)
 - [x] Añadir un test E2E (Playwright, ver sección 10)
 - [x] Añadir persistencia de progreso (`localStorage`, ver sección 11)
@@ -146,7 +146,7 @@ Caminos razonables si se decide invertir tiempo en convertirlo en algo con poten
 - Añadidos `README.md` y `.gitignore`.
 - Verificado con `npm run build` (15 módulos transformados sin error) y con el dev server de Vite (`index.html`, `/src/main.js`, imágenes y CSS responden 200, sin errores de resolución de imports). No se pudo abrir un navegador real en este entorno (sin acceso de red para descargar el binario headless), así que falta una verificación visual manual del juego en ejecución.
 
-Pendiente fuera de esta ronda (requiere una decisión de negocio, no es un "arreglo"): la decisión sobre licencia/originalidad del nombre y el arte (ver sección 6).
+Todos los puntos del checklist (sección 8) están resueltos a fecha de esta ronda.
 
 ## 10. Sistema de batallas (añadido en esta ronda)
 

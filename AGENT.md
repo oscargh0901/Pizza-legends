@@ -26,65 +26,66 @@ Historial de commits (`git log`): `Initial commit` → `a` → `afinal`. Mensaje
 | Render | Canvas 2D API | Sprites dibujados manualmente, sin motor (Phaser, PixiJS, etc.) |
 | Módulos | Ninguno | Clases globales cargadas vía `<script>` en orden manual en `index.html` |
 | Estilos | CSS plano | `styles/global.css`, `styles/TextMessage.css`, escalado por `transform: scale(3)` |
-| Build / bundler | **Ninguno** | No hay `package.json`, ni Webpack/Vite/Parcel |
-| Tests | **Ninguno** | No hay test runner ni una sola prueba |
-| Persistencia | **Ninguna** | Sin `localStorage`, sin backend |
-| Servidor | Implícito | Las rutas son absolutas (`/images/...`, `/utils.js`), requiere servir con un servidor estático (live-server, http-server); no funciona abriendo el `index.html` directo con `file://` |
+| Build / bundler | **Vite** | `package.json` + `npm run dev` / `npm run build` (añadido) |
+| Tests | **Ninguno** | No hay test runner ni una sola prueba (pendiente) |
+| Persistencia | **Ninguna** | Sin `localStorage`, sin backend (pendiente) |
+| Servidor | Vite dev server | `npm run dev` sirve `index.html` + `public/` en `http://localhost:5173` |
 
-**Estructura de archivos:**
+**Estructura de archivos (actualizada tras migrar a Vite + módulos ES):**
 ```
-index.html          → carga todos los scripts en orden manual
-init.js              → punto de entrada, instancia Overworld
-Overworld.js         → bucle de juego (game loop), cámara, draw order
-OverworldMap.js      → datos de mapas (DemoRoom, Kitchen) + lógica de paredes/cutscenes
-OverworldEvent.js    → ejecuta eventos de cutscene (walk, stand, textMessage)
-GameObject.js        → clase base de entidades (posición, sprite, behaviorLoop)
-Person.js            → extiende GameObject con movimiento por input/cuadrícula
-Sprite.js            → animaciones por hoja de sprites (spritesheet)
-TextMessage.js       → caja de diálogo
-DirectionInput.js     → input de teclado (flechas/WASD)
-KeyPressListener.js  → listener de tecla puntual (Enter)
-utils.js             → helpers de cuadrícula y eventos custom
-images/              → mapas, personajes, iconos de pizza, UI de batalla (sin usar aún)
+index.html            → un solo <script type="module" src="/src/main.js">
+package.json           → scripts npm (dev/build/preview) y dependencia de Vite
+src/                   → código del motor, en módulos ES (import/export)
+  main.js               → punto de entrada, instancia Overworld
+  Overworld.js          → bucle de juego (game loop), cámara, draw order
+  OverworldMap.js       → clase del motor: paredes, cutscenes (sin datos de contenido)
+  maps.js               → datos de mapas (DemoRoom, Kitchen), separados del motor
+  OverworldEvent.js     → ejecuta eventos de cutscene (walk, stand, textMessage)
+  GameObject.js         → clase base de entidades (posición, sprite, behaviorLoop)
+  Person.js             → extiende GameObject con movimiento por input/cuadrícula
+  Sprite.js             → animaciones por hoja de sprites (spritesheet)
+  TextMessage.js        → caja de diálogo
+  DirectionInput.js     → input de teclado (flechas/WASD)
+  KeyPressListener.js   → listener de tecla puntual (Enter)
+  utils.js              → helpers de cuadrícula y eventos custom
+public/                → assets servidos tal cual por Vite
+  images/                → mapas, personajes, iconos de pizza, UI de batalla (sin usar aún)
+  styles/                → CSS
 ```
 
 ## 4. Errores detectados
 
-1. **`KeyPressListener.unbind()` no desvincula nada — bug real.** (`KeyPressListener.js:20-23`)
-   ```js
-   unbind() {
-       document.addEventListener("keydown", this.keydownFunction); // debería ser removeEventListener
-       document.addEventListener("keyup", this.keyupFunction);
-   }
-   ```
-   Usa `addEventListener` en vez de `removeEventListener`. Resultado: cada vez que se cierra un `TextMessage` (que llama a `unbind()`), en lugar de quitar el listener de Enter, **se duplica**. Tras varios diálogos, una sola pulsación de Enter dispara el callback múltiples veces → fuga de listeners y comportamiento errático progresivo. Es el bug más importante del repo.
+> Estado: los puntos 1-4 y 6 ya se corrigieron (ver "Cambios aplicados" al final). Se dejan documentados para que quede constancia de qué se encontró y por qué.
 
-2. **`console.log` de depuración en código "final".** (`GameObject.js:21`, `OverworldMap.js:72`) — quedó `console.log("mounting!")` y `console.log({ match })` de cuando se depuraba el tutorial. Hay que retirarlos antes de cualquier release.
+1. ~~**`KeyPressListener.unbind()` no desvincula nada — bug real.**~~ **Corregido.** (`src/KeyPressListener.js:20-23`)
+   Usaba `addEventListener` en vez de `removeEventListener` en `unbind()`. Cada vez que se cerraba un `TextMessage` (que llama a `unbind()`), en lugar de quitar el listener de Enter, **se duplicaba**. Tras varios diálogos, una sola pulsación de Enter disparaba el callback múltiples veces → fuga de listeners y comportamiento errático progresivo. Era el bug más importante del repo.
 
-3. **Typo tolerado por JS pero descuidado.** (`OverworldMap.js:68`) — `hero. direction` (espacio antes de la propiedad). Funciona porque JS ignora el espacio, pero indica falta de linter/formateo.
+2. ~~**`console.log` de depuración en código "final".**~~ **Corregido.** Se retiraron `console.log("mounting!")` (`GameObject.js`) y `console.log({ match })` (`OverworldMap.js`).
 
-4. **Sombra de sprite "hardcodeada".** (`Sprite.js:13`) — `this.useShadow = true; //config.useShadow || false` — la opción de configurar la sombra está comentada y deshabilitada, es código muerto a medio terminar.
+3. ~~**Typo tolerado por JS pero descuidado.**~~ **Corregido.** `hero. direction` → `hero.direction` en `OverworldMap.js`.
 
-5. **Sin manejo de errores de carga de imágenes.** Todas las clases (`Sprite`, `OverworldMap`) asumen que las imágenes siempre cargan bien; si una ruta falla, el juego sigue "vivo" pero dibuja huecos sin avisar en consola de forma clara.
+4. ~~**Sombra de sprite "hardcodeada".**~~ **Corregido.** `Sprite.js` ahora respeta `config.useShadow` en vez de tenerlo forzado a `true` con la opción comentada.
 
-6. **Datos de contenido mezclados con lógica de motor.** Los mapas (`DemoRoom`, `Kitchen`) están definidos inline dentro de `OverworldMap.js` (`window.OverworldMaps = {...}`), junto a la clase que los consume. Esto hará insostenible añadir más mapas/niveles.
+5. **Sin manejo de errores de carga de imágenes.** (pendiente) Todas las clases (`Sprite`, `OverworldMap`) asumen que las imágenes siempre cargan bien; si una ruta falla, el juego sigue "vivo" pero dibuja huecos sin avisar en consola de forma clara.
 
-7. **Sin control de colisiones por mapa real ni capas de profundidad** más allá de un diccionario plano de paredes (`walls`) — no escala bien a mapas grandes ni a colisiones con objetos dinámicos.
+6. ~~**Datos de contenido mezclados con lógica de motor.**~~ **Corregido.** Los mapas (`DemoRoom`, `Kitchen`) se movieron a `src/maps.js`, separados de la clase `OverworldMap` (motor).
 
-8. **Sin gestión de resolución/responsive.** El canvas es fijo a 352×198px y se escala con `transform: scale(3)` vía CSS; no se adapta a distintos tamaños de pantalla ni a móvil.
+7. **Sin control de colisiones por mapa real ni capas de profundidad** (pendiente) más allá de un diccionario plano de paredes (`walls`) — no escala bien a mapas grandes ni a colisiones con objetos dinámicos.
+
+8. **Sin gestión de resolución/responsive.** (pendiente) El canvas es fijo a 352×198px y se escala con `transform: scale(3)` vía CSS; no se adapta a distintos tamaños de pantalla ni a móvil.
 
 ## 5. Mejoras sugeridas (priorizadas)
 
-**Críticas (antes de seguir construyendo encima):**
-- Arreglar `KeyPressListener.unbind()` (cambiar a `removeEventListener`).
-- Quitar los `console.log` de depuración.
-- Añadir `package.json` + un bundler ligero (Vite es el más simple) para poder usar módulos ES (`import`/`export`) en vez de variables globales y `<script>` en orden manual.
-- Añadir un `README.md` con instrucciones para ejecutar el proyecto (requiere servidor estático).
-- Añadir `.gitignore` y una licencia explícita (ver sección 6, importante por el origen tutorial).
+**Críticas (antes de seguir construyendo encima):** ✅ hechas en esta ronda
+- ~~Arreglar `KeyPressListener.unbind()` (cambiar a `removeEventListener`).~~
+- ~~Quitar los `console.log` de depuración.~~
+- ~~Añadir `package.json` + un bundler ligero (Vite) para poder usar módulos ES (`import`/`export`) en vez de variables globales y `<script>` en orden manual.~~
+- ~~Añadir un `README.md` con instrucciones para ejecutar el proyecto.~~
+- ~~Separar datos de mapas/contenido del motor (`src/maps.js`).~~
+- Falta: añadir `.gitignore` con licencia explícita — el `.gitignore` ya está, la licencia sigue pendiente de decisión (ver sección 6, importante por el origen tutorial).
 
 **Funcionales (para que sea un juego real):**
 - Implementar el sistema de batallas (ya hay arte preparado: `*Battle.png`, iconos chill/fungi/spicy/veggie, `SingleMemberDisplay.png`) — es la mecánica central que falta y la que justifica el nombre "Pizza Legends".
-- Separar datos de mapas/contenido a JSON o módulos independientes del motor.
 - Añadir persistencia (`localStorage` o backend) para guardar progreso.
 - Añadir un sistema de transición entre mapas (actualmente solo hay un mapa cargado, `Kitchen` está definida pero nunca se usa).
 - Soporte táctil/mobile (controles en pantalla) si se apunta a web/móvil.
@@ -116,11 +117,25 @@ Caminos razonables si se decide invertir tiempo en convertirlo en algo con poten
 
 ## 8. Próximos pasos sugeridos (checklist)
 
-- [ ] Arreglar bug de `KeyPressListener.unbind()`
-- [ ] Limpiar `console.log` de depuración
-- [ ] Añadir `package.json`, bundler (Vite) y módulos ES
-- [ ] Añadir `README.md` con instrucciones de ejecución
+- [x] Arreglar bug de `KeyPressListener.unbind()`
+- [x] Limpiar `console.log` de depuración
+- [x] Añadir `package.json`, bundler (Vite) y módulos ES
+- [x] Añadir `README.md` con instrucciones de ejecución
+- [x] Separar datos de mapas de la lógica del motor
 - [ ] Decidir y documentar licencia / originalidad del arte y nombre
 - [ ] Implementar sistema de batallas (ya hay assets listos)
-- [ ] Separar datos de mapas de la lógica del motor
 - [ ] Añadir persistencia de progreso
+
+## 9. Cambios aplicados en esta ronda
+
+- `KeyPressListener.unbind()` ahora usa `removeEventListener` (antes duplicaba listeners en cada diálogo cerrado).
+- Eliminados los `console.log` de depuración en `GameObject.js` y `OverworldMap.js`.
+- Corregido el typo `hero. direction` → `hero.direction`.
+- `Sprite.js` respeta `config.useShadow` en vez de tenerlo forzado.
+- Proyecto migrado a **Vite** + **módulos ES**: `package.json`, `npm run dev`/`build`/`preview`, código movido a `src/`, assets estáticos movidos a `public/`.
+- Datos de mapas (`DemoRoom`, `Kitchen`) separados del motor en `src/maps.js`; `OverworldMap.js` ahora solo contiene la clase.
+- `index.html` simplificado a un único `<script type="module" src="/src/main.js">` en vez de 11 `<script>` en orden manual.
+- Añadidos `README.md` y `.gitignore`.
+- Verificado con `npm run build` (15 módulos transformados sin error) y con el dev server de Vite (`index.html`, `/src/main.js`, imágenes y CSS responden 200, sin errores de resolución de imports). No se pudo abrir un navegador real en este entorno (sin acceso de red para descargar el binario headless), así que falta una verificación visual manual del juego en ejecución.
+
+Pendiente fuera de esta ronda (requiere decisiones de diseño/negocio, no son "arreglos"): sistema de batallas, persistencia de progreso, y la decisión sobre licencia/originalidad del nombre y el arte.

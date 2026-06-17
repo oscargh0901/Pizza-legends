@@ -1,4 +1,6 @@
-class TextMessage {
+import { KeyPressListener } from "./KeyPressListener.js";
+
+export class TextMessage {
   constructor({ text, onComplete }) {
     this.text = text;
     this.onComplete = onComplete;

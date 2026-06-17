@@ -1,4 +1,4 @@
-# AGENT.md — Escaneo del proyecto "Pizza Legends"
+# CLAUDE.md — Escaneo del proyecto "Pizza Legends"
 
 > Documento de referencia generado a partir de un escaneo completo del repositorio (código, assets, historial git). Pensado para que cualquier persona (o agente) que retome el proyecto entienda en qué estado está, qué arreglar y hacia dónde podría evolucionar.
 

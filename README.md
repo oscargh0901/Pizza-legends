@@ -48,6 +48,7 @@ src/               Código del motor (módulos ES)
   Sprite.js         Animación de sprites
   OverworldEvent.js / TextMessage.js   Cutscenes y diálogos
   Battle.js / Combatant.js / pizzas.js   Sistema de batallas por turnos
+  Storage.js        Persistencia en localStorage (posición del héroe, enemigos derrotados)
   DirectionInput.js / KeyPressListener.js   Entrada de teclado
   utils.js          Helpers de cuadrícula y eventos
 public/             Assets estáticos servidos tal cual (imágenes, CSS)

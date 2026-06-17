@@ -6,7 +6,7 @@
 
 **Pizza Legends** es un prototipo muy temprano de un juego RPG estilo Pokémon/Zelda (vista cenital, movimiento por cuadrícula, NPCs, diálogos) construido en **JavaScript vanilla + Canvas 2D**, sin frameworks ni build tools.
 
-El repo cubre la parte de **"overworld"** (mapa explorable, movimiento del héroe, NPCs con comportamiento en bucle, cutscenes de diálogo) y ahora también un **sistema de batallas por turnos básico** (1 vs 1, sin equipo/colección de "pizzas" más allá de un combatiente por bando, sin menús, sin persistencia), usando los assets que ya estaban en `images/` (fondos de batalla, iconos de tipos de pizza, displays de combate) pero que hasta ahora no se usaban. Sigue siendo un proyecto **a medio terminar** (sin progresión, sin colección de pizzas, sin guardado), consistente con seguir un tutorial paso a paso y extenderlo con una mecánica propia.
+El repo cubre la parte de **"overworld"** (mapa explorable, movimiento del héroe, NPCs con comportamiento en bucle, cutscenes de diálogo), un **sistema de batallas por turnos básico** (1 vs 1, sin equipo/colección de "pizzas" más allá de un combatiente por bando, sin menús) y ahora también **persistencia de progreso en `localStorage`** (posición del héroe y enemigos derrotados sobreviven a un recargo de página), usando los assets que ya estaban en `images/` (fondos de batalla, iconos de tipos de pizza, displays de combate) pero que hasta ahora no se usaban. Sigue siendo un proyecto **a medio terminar** (sin progresión real, sin colección de pizzas, sin recompensas), consistente con seguir un tutorial paso a paso y extenderlo con mecánicas propias.
 
 Historial de commits (`git log`): `Initial commit` → `a` → `afinal`. Mensajes no descriptivos, típico de quien copia un tutorial sin documentar avances propios.
 
@@ -28,7 +28,7 @@ Historial de commits (`git log`): `Initial commit` → `a` → `afinal`. Mensaje
 | Estilos | CSS plano | `styles/global.css`, `styles/TextMessage.css`, `styles/Battle.css`, escalado por `transform: scale(3)` |
 | Build / bundler | **Vite** | `package.json` + `npm run dev` / `npm run build` |
 | Tests | **Playwright (E2E)** | `npm run test:e2e` — juega la partida real (mover, hablar, batalla) en un navegador headless |
-| Persistencia | **Ninguna** | Sin `localStorage`, sin backend (pendiente) |
+| Persistencia | **`localStorage`** | `src/Storage.js` — posición del héroe y enemigos derrotados |
 | Servidor | Vite dev server | `npm run dev` sirve `index.html` + `public/` en `http://localhost:5173` |
 
 **Estructura de archivos (actualizada tras migrar a Vite + módulos ES):**
@@ -48,6 +48,7 @@ src/                   → código del motor, en módulos ES (import/export)
   Battle.js             → motor de batalla por turnos: UI DOM, HUD, turnos, fin de combate
   Combatant.js          → clase de combatiente (hp, tipo, movimientos, isFainted)
   pizzas.js             → datos de batalla: tabla de tipos, movimientos, roster jugador/enemigo
+  Storage.js             → persistencia en localStorage (posición del héroe, enemigos derrotados)
   DirectionInput.js     → input de teclado (flechas/WASD)
   KeyPressListener.js   → listener de tecla puntual (Enter)
   utils.js              → helpers de cuadrícula y eventos custom
@@ -92,7 +93,7 @@ playwright.config.js   → arranca el dev server y configura el navegador para e
 
 **Funcionales (para que sea un juego real):**
 - ~~Implementar el sistema de batallas (ya hay arte preparado: `*Battle.png`, iconos chill/fungi/spicy/veggie, `SingleMemberDisplay.png`)~~ **Hecho (versión básica)**, ver sección 10. Falta: equipo de varias pizzas por bando, recompensas/consecuencias tras ganar o perder, más mapas de batalla y enemigos.
-- Añadir persistencia (`localStorage` o backend) para guardar progreso.
+- ~~Añadir persistencia (`localStorage` o backend) para guardar progreso.~~ **Hecho**, ver sección 11. Falta: persistir también el mapa actual si se añaden más mapas jugables, y un backend si en algún momento se quiere progreso multi-dispositivo.
 - Añadir un sistema de transición entre mapas (actualmente solo hay un mapa cargado, `Kitchen` está definida pero nunca se usa).
 - Soporte táctil/mobile (controles en pantalla) si se apunta a web/móvil.
 
@@ -131,7 +132,7 @@ Caminos razonables si se decide invertir tiempo en convertirlo en algo con poten
 - [ ] Decidir y documentar licencia / originalidad del arte y nombre
 - [x] Implementar sistema de batallas (versión básica 1 vs 1, ver sección 10)
 - [x] Añadir un test E2E (Playwright, ver sección 10)
-- [ ] Añadir persistencia de progreso
+- [x] Añadir persistencia de progreso (`localStorage`, ver sección 11)
 
 ## 9. Cambios aplicados en esta ronda
 
@@ -145,7 +146,7 @@ Caminos razonables si se decide invertir tiempo en convertirlo en algo con poten
 - Añadidos `README.md` y `.gitignore`.
 - Verificado con `npm run build` (15 módulos transformados sin error) y con el dev server de Vite (`index.html`, `/src/main.js`, imágenes y CSS responden 200, sin errores de resolución de imports). No se pudo abrir un navegador real en este entorno (sin acceso de red para descargar el binario headless), así que falta una verificación visual manual del juego en ejecución.
 
-Pendiente fuera de esta ronda (requiere decisiones de diseño/negocio, no son "arreglos"): sistema de batallas, persistencia de progreso, y la decisión sobre licencia/originalidad del nombre y el arte.
+Pendiente fuera de esta ronda (requiere una decisión de negocio, no es un "arreglo"): la decisión sobre licencia/originalidad del nombre y el arte (ver sección 6).
 
 ## 10. Sistema de batallas (añadido en esta ronda)
 
@@ -163,8 +164,21 @@ El tutorial original no cubre el combate en el punto donde estaba el código, as
 
 **Limitaciones conocidas (a propósito, para no inventar de más):**
 - Solo hay un combatiente por bando; no hay equipo/colección de varias pizzas.
-- No hay recompensas ni consecuencias tras ganar o perder: se puede volver a retar a `npcC` indefinidamente (no hay persistencia, ver sección pendiente).
+- No hay recompensas tras ganar (ni XP ni objetos); solo se recuerda que `npcC` ya fue derrotado (ver sección 11) para no repetir la batalla.
 - Solo hay un enemigo y un fondo de batalla (`DemoBattle.png`); los demás fondos de batalla (`KitchenBattle.png`, `StreetBattle.png`, etc.) siguen sin usarse.
+
+## 11. Persistencia de progreso (añadido en esta ronda)
+
+`src/Storage.js` envuelve `localStorage` en un único objeto serializado bajo la key `pizzaLegendsSave` (`JSON.parse`/`JSON.stringify`), con una API mínima: `getHeroPosition()`/`setHeroPosition(x, y)` y `isDefeated(enemyId)`/`markDefeated(enemyId)`.
+
+**Cableado:**
+- `src/Person.js`: cada vez que el héroe (`isPlayerControlled`) termina de moverse una casilla, guarda su posición.
+- `src/maps.js`: al construir `DemoRoom`, si hay una posición guardada se usa como punto de partida del héroe en vez de la posición por defecto `(5,6)`.
+- `src/OverworldEvent.js`: el evento `battle` comprueba `Storage.isDefeated(enemyId)` antes de lanzar la batalla — si ya fue derrotado, se resuelve la cutscene sin volver a luchar; si se gana, se marca como derrotado con `Storage.markDefeated(enemyId)`.
+
+**Cubierto por el test E2E** (`tests/battle.spec.js`, segundo test): juega la batalla completa, comprueba el contenido de `localStorage`, recarga la página y confirma que el héroe aparece en la posición guardada y que retar a `npcC` ya no abre la pantalla de batalla.
+
+**Limitación conocida (a propósito):** solo es progreso local al navegador/dispositivo — no hay cuenta de usuario ni backend, así que borrar el `localStorage` del navegador (o cambiar de dispositivo) reinicia el progreso.
 
 **Verificación realizada:**
 - `node --check` en todos los archivos de `src/`.

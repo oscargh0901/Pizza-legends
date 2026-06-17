@@ -1,5 +1,6 @@
 import { GameObject } from "./GameObject.js";
 import { utils } from "./utils.js";
+import { Storage } from "./Storage.js";
 
 export class Person extends GameObject {
     constructor(config) {
@@ -77,10 +78,13 @@ export class Person extends GameObject {
   
         if (this.movingProgressRemaining === 0) {
           //We finished the walk!
+          if (this.isPlayerControlled) {
+            Storage.setHeroPosition(this.x, this.y);
+          }
           utils.emitEvent("PersonWalkingComplete", {
             whoId: this.id
           })
-  
+
         }
     }
   

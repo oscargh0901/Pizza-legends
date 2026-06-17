@@ -24,10 +24,10 @@ Historial de commits (`git log`): `Initial commit` → `a` → `afinal`. Mensaje
 |---|---|---|
 | Lenguaje | JavaScript ES6 (clases) | Sin TypeScript, sin linter configurado |
 | Render | Canvas 2D API | Sprites dibujados manualmente, sin motor (Phaser, PixiJS, etc.) |
-| Módulos | Ninguno | Clases globales cargadas vía `<script>` en orden manual en `index.html` |
-| Estilos | CSS plano | `styles/global.css`, `styles/TextMessage.css`, escalado por `transform: scale(3)` |
-| Build / bundler | **Vite** | `package.json` + `npm run dev` / `npm run build` (añadido) |
-| Tests | **Ninguno** | No hay test runner ni una sola prueba (pendiente) |
+| Módulos | **ES Modules** | `import`/`export` en `src/`, cargados vía `<script type="module">` |
+| Estilos | CSS plano | `styles/global.css`, `styles/TextMessage.css`, `styles/Battle.css`, escalado por `transform: scale(3)` |
+| Build / bundler | **Vite** | `package.json` + `npm run dev` / `npm run build` |
+| Tests | **Playwright (E2E)** | `npm run test:e2e` — juega la partida real (mover, hablar, batalla) en un navegador headless |
 | Persistencia | **Ninguna** | Sin `localStorage`, sin backend (pendiente) |
 | Servidor | Vite dev server | `npm run dev` sirve `index.html` + `public/` en `http://localhost:5173` |
 
@@ -54,6 +54,9 @@ src/                   → código del motor, en módulos ES (import/export)
 public/                → assets servidos tal cual por Vite
   images/                → mapas, personajes, iconos de pizza, UI de batalla (ya en uso)
   styles/                → CSS (incluye Battle.css)
+tests/
+  battle.spec.js         → test E2E (Playwright): juega la partida real en navegador headless
+playwright.config.js   → arranca el dev server y configura el navegador para el test E2E
 ```
 
 ## 4. Errores detectados
@@ -95,7 +98,7 @@ public/                → assets servidos tal cual por Vite
 
 **Calidad de código:**
 - Introducir ESLint + Prettier.
-- Tests unitarios mínimos para utils (`nextPosition`, `withGrid`, etc.) y lógica de colisiones.
+- ~~Tests mínimos~~ Hay un test E2E (Playwright, ver sección 10). Falta: tests unitarios para utils (`nextPosition`, `withGrid`, etc.) y lógica de colisiones.
 - Tipado opcional con JSDoc o migración a TypeScript a medida que crezca.
 
 ## 6. Origen del proyecto y originalidad (importante)
@@ -127,6 +130,7 @@ Caminos razonables si se decide invertir tiempo en convertirlo en algo con poten
 - [x] Separar datos de mapas de la lógica del motor
 - [ ] Decidir y documentar licencia / originalidad del arte y nombre
 - [x] Implementar sistema de batallas (versión básica 1 vs 1, ver sección 10)
+- [x] Añadir un test E2E (Playwright, ver sección 10)
 - [ ] Añadir persistencia de progreso
 
 ## 9. Cambios aplicados en esta ronda
@@ -162,9 +166,8 @@ El tutorial original no cubre el combate en el punto donde estaba el código, as
 - No hay recompensas ni consecuencias tras ganar o perder: se puede volver a retar a `npcC` indefinidamente (no hay persistencia, ver sección pendiente).
 - Solo hay un enemigo y un fondo de batalla (`DemoBattle.png`); los demás fondos de batalla (`KitchenBattle.png`, `StreetBattle.png`, etc.) siguen sin usarse.
 
-**Verificación realizada** (de nuevo sin navegador real disponible en este entorno):
+**Verificación realizada:**
 - `node --check` en todos los archivos de `src/`.
 - Pruebas de lógica pura en Node (sin DOM) para `getTypeMultiplier`, `calculateDamage` y `Combatant` (multiplicadores x2/x0.5/x1, daño calculado, clamp de HP a 0, `isFainted`).
-- `vite build` exitoso (18 módulos transformados, antes 15).
-- Servidor de desarrollo de Vite: verificado con `curl` que `Battle.js`, `Combatant.js`, `pizzas.js`, `Battle.css` y los assets de batalla (`DemoBattle.png`, `SingleMemberDisplay.png`, iconos de tipo) responden 200.
-- Sigue pendiente una verificación visual manual en un navegador real (recomendado: `npm install && npm run dev`, hablar con `npcC` en `DemoRoom`).
+- `vite build` exitoso (18 módulos transformados).
+- Test E2E real con Playwright (`tests/battle.spec.js`, `npm run test:e2e`): abre el juego en Chromium headless, mueve al héroe, habla con `npcC`, juega la batalla completa y comprueba HUD, daño, victoria y diálogo de cierre. Gracias a esta prueba se encontró y arregló un bug visual real (el HUD de batalla tapaba el nombre con la barra de HP porque `SingleMemberDisplay.png` es solo la ranura de la barra, no una placa de nombre completa).

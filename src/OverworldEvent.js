@@ -1,5 +1,6 @@
 import { utils } from "./utils.js";
 import { TextMessage } from "./TextMessage.js";
+import { Battle } from "./Battle.js";
 
 export class OverworldEvent {
   constructor({ map, event}) {
@@ -60,6 +61,15 @@ export class OverworldEvent {
       onComplete: () => resolve()
     })
     message.init( document.querySelector(".game-container") )
+  }
+
+  battle(resolve) {
+    const battle = new Battle({
+      playerId: "hero",
+      enemyId: this.event.enemyId,
+      onComplete: () => resolve()
+    })
+    battle.init( document.querySelector(".game-container") )
   }
 
   init() {

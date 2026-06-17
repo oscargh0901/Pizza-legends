@@ -1,0 +1,110 @@
+.Battle {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-size: cover;
+    image-rendering: pixelated;
+}
+
+.Battle_hud {
+    position: absolute;
+    width: 118px;
+    height: 28px;
+}
+
+.Battle_hud_enemy {
+    top: 8px;
+    left: 8px;
+}
+
+.Battle_hud_player {
+    bottom: 64px;
+    right: 8px;
+}
+
+.Battle_hud_bg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    image-rendering: pixelated;
+}
+
+.Battle_type_icon {
+    position: absolute;
+    top: 4px;
+    left: 4px;
+    width: 16px;
+    height: 16px;
+    image-rendering: pixelated;
+}
+
+.Battle_name {
+    position: absolute;
+    top: 2px;
+    left: 24px;
+    margin: 0;
+    font-size: 8px;
+    color: var(--menu-font-color);
+}
+
+.Battle_hpBar {
+    position: absolute;
+    left: 24px;
+    right: 6px;
+    bottom: 6px;
+    height: 4px;
+    background: var(--menu-border-color);
+}
+
+.Battle_hpBar_fill {
+    height: 100%;
+    width: 100%;
+    background: #4caf50;
+    transition: width 0.3s;
+}
+
+.Battle_message {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 36px;
+    margin: 0;
+    padding: 4px 8px;
+    font-size: 10px;
+    background: var(--menu-background);
+    border-top: 1px solid var(--menu-border-color);
+    color: var(--menu-font-color);
+}
+
+.Battle_moves {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 36px;
+    display: flex;
+    flex-wrap: wrap;
+    align-content: flex-start;
+    gap: 2px;
+    padding: 4px;
+    background: var(--menu-background);
+}
+
+.Battle_move_button {
+    flex: 1 0 45%;
+    font-size: 8px;
+    font-family: inherit;
+    padding: 2px;
+    border: 1px solid var(--menu-border-color);
+    background: #fff;
+    color: var(--menu-font-color);
+    cursor: pointer;
+}
+
+.Battle_move_button:hover {
+    background: var(--menu-selected-background);
+}

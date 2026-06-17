@@ -6,7 +6,7 @@
 
 **Pizza Legends** es un prototipo muy temprano de un juego RPG estilo Pokémon/Zelda (vista cenital, movimiento por cuadrícula, NPCs, diálogos) construido en **JavaScript vanilla + Canvas 2D**, sin frameworks ni build tools.
 
-El repo solo cubre la parte de **"overworld"** (mapa explorable, movimiento del héroe, NPCs con comportamiento en bucle, cutscenes de diálogo). **No existe sistema de batallas, ni de equipo/colección de "pizzas", ni menús, ni persistencia**, aunque los assets de esas features ya están en `images/` (fondos de batalla, iconos de tipos de pizza, displays de combate). Esto confirma que es un proyecto **a medio terminar**, consistente con seguir un tutorial paso a paso y detenerse en un punto intermedio.
+El repo cubre la parte de **"overworld"** (mapa explorable, movimiento del héroe, NPCs con comportamiento en bucle, cutscenes de diálogo) y ahora también un **sistema de batallas por turnos básico** (1 vs 1, sin equipo/colección de "pizzas" más allá de un combatiente por bando, sin menús, sin persistencia), usando los assets que ya estaban en `images/` (fondos de batalla, iconos de tipos de pizza, displays de combate) pero que hasta ahora no se usaban. Sigue siendo un proyecto **a medio terminar** (sin progresión, sin colección de pizzas, sin guardado), consistente con seguir un tutorial paso a paso y extenderlo con una mecánica propia.
 
 Historial de commits (`git log`): `Initial commit` → `a` → `afinal`. Mensajes no descriptivos, típico de quien copia un tutorial sin documentar avances propios.
 
@@ -16,7 +16,7 @@ Historial de commits (`git log`): `Initial commit` → `a` → `afinal`. Mensaje
 - Se mueve con flechas/WASD en una cuadrícula de 16px.
 - Hay NPCs con rutinas de movimiento/espera en bucle (`behaviorLoop`) y diálogos al pulsar Enter si están enfrente (`talking`).
 - Los diálogos se muestran como cajas de texto inferiores tipo Pokémon, con cutscenes simples (encadenar "andar", "estar quieto", "mensaje").
-- La temática "pizza" (héroe, tipos de pizza: chill/fungi/spicy/veggie) sugiere que el plan original era un sistema de batallas por turnos con "pizzas" como criaturas coleccionables — pero esa mecánica **no está implementada**, solo hay arte preparado para ella.
+- La temática "pizza" (héroe, tipos de pizza: chill/fungi/spicy/veggie) tiene ahora un primer sistema de batallas por turnos: un NPC retador (`npcC`) inicia un combate 1 vs 1 con tabla de tipos (ciclo spicy→chill→fungi→veggie→spicy, con multiplicador x2/x0.5/x1), HUD con barra de HP e iconos de tipo, y selección de movimiento por botones. Es una mecánica **inventada para esta extensión** (el tutorial original no la detalla en el punto donde está el código) — todavía no hay equipo de varias pizzas, ni recompensas, ni progresión tras ganar/perder.
 
 ## 3. Tecnologías
 
@@ -45,12 +45,15 @@ src/                   → código del motor, en módulos ES (import/export)
   Person.js             → extiende GameObject con movimiento por input/cuadrícula
   Sprite.js             → animaciones por hoja de sprites (spritesheet)
   TextMessage.js        → caja de diálogo
+  Battle.js             → motor de batalla por turnos: UI DOM, HUD, turnos, fin de combate
+  Combatant.js          → clase de combatiente (hp, tipo, movimientos, isFainted)
+  pizzas.js             → datos de batalla: tabla de tipos, movimientos, roster jugador/enemigo
   DirectionInput.js     → input de teclado (flechas/WASD)
   KeyPressListener.js   → listener de tecla puntual (Enter)
   utils.js              → helpers de cuadrícula y eventos custom
 public/                → assets servidos tal cual por Vite
-  images/                → mapas, personajes, iconos de pizza, UI de batalla (sin usar aún)
-  styles/                → CSS
+  images/                → mapas, personajes, iconos de pizza, UI de batalla (ya en uso)
+  styles/                → CSS (incluye Battle.css)
 ```
 
 ## 4. Errores detectados
@@ -85,7 +88,7 @@ public/                → assets servidos tal cual por Vite
 - Falta: añadir `.gitignore` con licencia explícita — el `.gitignore` ya está, la licencia sigue pendiente de decisión (ver sección 6, importante por el origen tutorial).
 
 **Funcionales (para que sea un juego real):**
-- Implementar el sistema de batallas (ya hay arte preparado: `*Battle.png`, iconos chill/fungi/spicy/veggie, `SingleMemberDisplay.png`) — es la mecánica central que falta y la que justifica el nombre "Pizza Legends".
+- ~~Implementar el sistema de batallas (ya hay arte preparado: `*Battle.png`, iconos chill/fungi/spicy/veggie, `SingleMemberDisplay.png`)~~ **Hecho (versión básica)**, ver sección 10. Falta: equipo de varias pizzas por bando, recompensas/consecuencias tras ganar o perder, más mapas de batalla y enemigos.
 - Añadir persistencia (`localStorage` o backend) para guardar progreso.
 - Añadir un sistema de transición entre mapas (actualmente solo hay un mapa cargado, `Kitchen` está definida pero nunca se usa).
 - Soporte táctil/mobile (controles en pantalla) si se apunta a web/móvil.
@@ -123,7 +126,7 @@ Caminos razonables si se decide invertir tiempo en convertirlo en algo con poten
 - [x] Añadir `README.md` con instrucciones de ejecución
 - [x] Separar datos de mapas de la lógica del motor
 - [ ] Decidir y documentar licencia / originalidad del arte y nombre
-- [ ] Implementar sistema de batallas (ya hay assets listos)
+- [x] Implementar sistema de batallas (versión básica 1 vs 1, ver sección 10)
 - [ ] Añadir persistencia de progreso
 
 ## 9. Cambios aplicados en esta ronda
@@ -139,3 +142,29 @@ Caminos razonables si se decide invertir tiempo en convertirlo en algo con poten
 - Verificado con `npm run build` (15 módulos transformados sin error) y con el dev server de Vite (`index.html`, `/src/main.js`, imágenes y CSS responden 200, sin errores de resolución de imports). No se pudo abrir un navegador real en este entorno (sin acceso de red para descargar el binario headless), así que falta una verificación visual manual del juego en ejecución.
 
 Pendiente fuera de esta ronda (requiere decisiones de diseño/negocio, no son "arreglos"): sistema de batallas, persistencia de progreso, y la decisión sobre licencia/originalidad del nombre y el arte.
+
+## 10. Sistema de batallas (añadido en esta ronda)
+
+El tutorial original no cubre el combate en el punto donde estaba el código, así que esta es una mecánica **diseñada e implementada desde cero** para esta extensión, reutilizando el arte que ya estaba en el repo sin usar.
+
+**Diseño:**
+- Tabla de tipos en ciclo de 4 (`src/pizzas.js`): `spicy` > `chill` > `fungi` > `veggie` > `spicy` (x2 si es fuerte contra el rival, x0.5 si es débil, x1 en cualquier otro caso, incluidos los movimientos de tipo `normal`).
+- Cada tipo tiene un movimiento propio (power 12) más un movimiento neutral compartido "Bite" (power 8, tipo `normal`).
+- `src/Combatant.js`: clase de motor con `hp`/`maxHp`, `isFainted`, `hpPercentage` y `takeDamage()`.
+- `src/Battle.js`: motor de la batalla — construye la UI en el DOM (mismo patrón que `TextMessage.js`: `createElement()` + `init(container)`), turno del jugador por botones de movimiento, turno del enemigo automático (movimiento aleatorio), HUD con barra de HP e icono de tipo por combatiente, fin de combate con `onComplete(didWin)`.
+- `public/styles/Battle.css`: overlay sobre `.game-container`, fondo `DemoBattle.png`, HUD basado en `SingleMemberDisplay.png`, estética pixel-art consistente con `TextMessage.css`.
+- `src/OverworldEvent.js`: nuevo tipo de evento `battle` que instancia `Battle` y resuelve la cutscene cuando termina (gana o pierde).
+- `src/maps.js`: nuevo NPC `npcC` en `DemoRoom` (reutiliza el sprite `npc3.png`) cuyo diálogo encadena un mensaje, el evento `battle` y un mensaje de despedida.
+- Roster de demo: jugador = "Margherita" (tipo `veggie`), enemigo = "Diabla" (tipo `spicy`) — elegido a propósito para que el movimiento propio del jugador sea súper efectivo contra el enemigo y se note la mecánica de tipos en la primera partida.
+
+**Limitaciones conocidas (a propósito, para no inventar de más):**
+- Solo hay un combatiente por bando; no hay equipo/colección de varias pizzas.
+- No hay recompensas ni consecuencias tras ganar o perder: se puede volver a retar a `npcC` indefinidamente (no hay persistencia, ver sección pendiente).
+- Solo hay un enemigo y un fondo de batalla (`DemoBattle.png`); los demás fondos de batalla (`KitchenBattle.png`, `StreetBattle.png`, etc.) siguen sin usarse.
+
+**Verificación realizada** (de nuevo sin navegador real disponible en este entorno):
+- `node --check` en todos los archivos de `src/`.
+- Pruebas de lógica pura en Node (sin DOM) para `getTypeMultiplier`, `calculateDamage` y `Combatant` (multiplicadores x2/x0.5/x1, daño calculado, clamp de HP a 0, `isFainted`).
+- `vite build` exitoso (18 módulos transformados, antes 15).
+- Servidor de desarrollo de Vite: verificado con `curl` que `Battle.js`, `Combatant.js`, `pizzas.js`, `Battle.css` y los assets de batalla (`DemoBattle.png`, `SingleMemberDisplay.png`, iconos de tipo) responden 200.
+- Sigue pendiente una verificación visual manual en un navegador real (recomendado: `npm install && npm run dev`, hablar con `npcC` en `DemoRoom`).

@@ -1,4 +1,4 @@
-class KeyPressListener {
+export class KeyPressListener {
     constructor(keyCode, callback) {
         let keySafe = true;
         this.keydownFunction = function(event) {
@@ -18,8 +18,8 @@ class KeyPressListener {
     }
 
     unbind() {
-        document.addEventListener("keydown", this.keydownFunction);
-        document.addEventListener("keyup", this.keyupFunction);
+        document.removeEventListener("keydown", this.keydownFunction);
+        document.removeEventListener("keyup", this.keyupFunction);
     }
 
 }

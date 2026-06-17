@@ -1,4 +1,9 @@
-class Overworld {
+import { KeyPressListener } from "./KeyPressListener.js";
+import { DirectionInput } from "./DirectionInput.js";
+import { OverworldMap } from "./OverworldMap.js";
+import { OverworldMaps } from "./maps.js";
+
+export class Overworld {
   constructor(config) {
     this.element = config.element;
     this.canvas = this.element.querySelector(".game-canvas");
@@ -50,7 +55,7 @@ class Overworld {
   }
  
   init() {
-   this.map = new OverworldMap(window.OverworldMaps.DemoRoom);
+   this.map = new OverworldMap(OverworldMaps.DemoRoom);
    this.map.mountObjects();
 
    this.bindActionInput();

@@ -1,4 +1,7 @@
-class GameObject {
+import { Sprite } from "./Sprite.js";
+import { OverworldEvent } from "./OverworldEvent.js";
+
+export class GameObject {
   constructor(config) {
     this.id = null;
     this.isMounted = false;
@@ -18,7 +21,6 @@ class GameObject {
   }
 
   mount(map) {
-    console.log("mounting!")
     this.isMounted = true;
     map.addWall(this.x, this.y);
 

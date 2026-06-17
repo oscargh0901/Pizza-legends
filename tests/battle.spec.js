@@ -44,3 +44,49 @@ test("hero can challenge npcC and win a battle with a super-effective move", asy
 
   expect(pageErrors).toEqual([]);
 });
+
+test("persists hero position and defeated enemies across a reload", async ({ page }) => {
+  const pageErrors = [];
+  page.on("pageerror", e => pageErrors.push(e.message));
+
+  await page.goto("/");
+  await expect(page.locator("canvas.game-canvas")).toBeVisible();
+
+  await page.keyboard.down("ArrowDown");
+  await page.waitForTimeout(1200);
+  await page.keyboard.up("ArrowDown");
+
+  await page.keyboard.press("Enter");
+  await expect(page.locator(".TextMessage_p")).toContainText("challenge");
+  await page.keyboard.press("Enter");
+  await expect(page.locator(".Battle")).toBeVisible();
+
+  // Win the battle the same way as the other test.
+  await expect(page.locator(".Battle_move_button")).toHaveCount(2, { timeout: 5000 });
+  await page.locator(".Battle_move_button").nth(0).click();
+  await expect(page.locator(".Battle_move_button")).toHaveCount(2, { timeout: 5000 });
+  await page.locator(".Battle_move_button").nth(0).click();
+  await expect(page.locator(".Battle_message")).toContainText("fainted", { timeout: 3000 });
+  await expect(page.locator(".Battle")).toBeHidden({ timeout: 4000 });
+  await page.keyboard.press("Enter");
+  await expect(page.locator(".TextMessage")).toHaveCount(0);
+
+  const savedData = await page.evaluate(() => JSON.parse(localStorage.getItem("pizzaLegendsSave")));
+  expect(savedData.defeatedEnemies).toContain("npcC");
+  expect(savedData.heroPosition).toBeTruthy();
+
+  await page.reload();
+  await expect(page.locator("canvas.game-canvas")).toBeVisible();
+
+  // The hero spawns already facing npcC from the saved position, so talking
+  // to it again skips straight past the battle since it's already won.
+  await page.keyboard.press("Enter");
+  await expect(page.locator(".TextMessage_p")).toContainText("challenge");
+  await page.keyboard.press("Enter");
+  await expect(page.locator(".Battle")).toHaveCount(0);
+  await expect(page.locator(".TextMessage_p")).toContainText("Until next time");
+  await page.keyboard.press("Enter");
+  await expect(page.locator(".TextMessage")).toHaveCount(0);
+
+  expect(pageErrors).toEqual([]);
+});

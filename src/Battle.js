@@ -15,10 +15,14 @@ export class Battle {
 
   createHudMarkup(combatant) {
     return `
-      <img class="Battle_hud_bg" src="/images/ui/SingleMemberDisplay.png" />
-      <img class="Battle_type_icon" src="${TYPE_ICONS[combatant.type]}" />
-      <p class="Battle_name">${combatant.name}</p>
-      <div class="Battle_hpBar"><div class="Battle_hpBar_fill"></div></div>
+      <div class="Battle_hud_label">
+        <img class="Battle_type_icon" src="${TYPE_ICONS[combatant.type]}" />
+        <p class="Battle_name">${combatant.name}</p>
+      </div>
+      <div class="Battle_hud_panel">
+        <img class="Battle_hud_bg" src="/images/ui/SingleMemberDisplay.png" />
+        <div class="Battle_hpBar"><div class="Battle_hpBar_fill"></div></div>
+      </div>
     `;
   }
 

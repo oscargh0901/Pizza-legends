@@ -11,7 +11,6 @@
 .Battle_hud {
     position: absolute;
     width: 118px;
-    height: 28px;
 }
 
 .Battle_hud_enemy {
@@ -24,6 +23,35 @@
     right: 8px;
 }
 
+.Battle_hud_label {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    margin-bottom: 2px;
+    padding: 1px 4px;
+    background: rgba(0, 0, 0, 0.45);
+    border-radius: 3px;
+    width: fit-content;
+}
+
+.Battle_type_icon {
+    width: 14px;
+    height: 14px;
+    image-rendering: pixelated;
+}
+
+.Battle_name {
+    margin: 0;
+    font-size: 9px;
+    color: #fff;
+}
+
+.Battle_hud_panel {
+    position: relative;
+    width: 118px;
+    height: 28px;
+}
+
 .Battle_hud_bg {
     position: absolute;
     top: 0;
@@ -33,31 +61,13 @@
     image-rendering: pixelated;
 }
 
-.Battle_type_icon {
-    position: absolute;
-    top: 4px;
-    left: 4px;
-    width: 16px;
-    height: 16px;
-    image-rendering: pixelated;
-}
-
-.Battle_name {
-    position: absolute;
-    top: 2px;
-    left: 24px;
-    margin: 0;
-    font-size: 8px;
-    color: var(--menu-font-color);
-}
-
 .Battle_hpBar {
     position: absolute;
-    left: 24px;
-    right: 6px;
-    bottom: 6px;
-    height: 4px;
-    background: var(--menu-border-color);
+    left: 38px;
+    top: 8px;
+    width: 54px;
+    height: 11px;
+    padding: 0 2px;
 }
 
 .Battle_hpBar_fill {

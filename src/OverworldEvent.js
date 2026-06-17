@@ -1,4 +1,7 @@
-class OverworldEvent {
+import { utils } from "./utils.js";
+import { TextMessage } from "./TextMessage.js";
+
+export class OverworldEvent {
   constructor({ map, event}) {
     this.map = map;
     this.event = event;

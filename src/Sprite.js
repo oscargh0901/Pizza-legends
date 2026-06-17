@@ -1,4 +1,6 @@
-class Sprite {
+import { utils } from "./utils.js";
+
+export class Sprite {
   constructor(config) {
 
     //Set up the image
@@ -10,12 +12,12 @@ class Sprite {
 
     //Shadow
     this.shadow = new Image();
-    this.useShadow = true; //config.useShadow || false
+    this.useShadow = config.useShadow ?? true;
     if (this.useShadow) {
       this.shadow.src = "/images/characters/shadow.png";
-    }
-    this.shadow.onload = () => {
-      this.isShadowLoaded = true;
+      this.shadow.onload = () => {
+        this.isShadowLoaded = true;
+      }
     }
 
     //Configure Animation & Initial State

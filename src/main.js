@@ -1,4 +1,5 @@
 import { Overworld } from "./Overworld.js";
+import { MobileWarning } from "./MobileWarning.js";
 
 (function () {
 
@@ -6,5 +7,10 @@ import { Overworld } from "./Overworld.js";
     element: document.querySelector(".game-container")
   });
   overworld.init();
+
+  if (MobileWarning.isLikelyMobile()) {
+    const warning = new MobileWarning();
+    warning.init(document.body);
+  }
 
 })();

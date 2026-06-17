@@ -49,14 +49,16 @@ src/                   → código del motor, en módulos ES (import/export)
   Combatant.js          → clase de combatiente (hp, tipo, movimientos, isFainted)
   pizzas.js             → datos de batalla: tabla de tipos, movimientos, roster jugador/enemigo
   Storage.js             → persistencia en localStorage (posición del héroe, enemigos derrotados)
+  MobileWarning.js       → detecta dispositivos táctiles sin teclado y muestra un aviso
   DirectionInput.js     → input de teclado (flechas/WASD)
   KeyPressListener.js   → listener de tecla puntual (Enter)
   utils.js              → helpers de cuadrícula y eventos custom
 public/                → assets servidos tal cual por Vite
   images/                → mapas, personajes, iconos de pizza, UI de batalla (ya en uso)
-  styles/                → CSS (incluye Battle.css)
+  styles/                → CSS (incluye Battle.css, MobileWarning.css)
 tests/
   battle.spec.js         → test E2E (Playwright): juega la partida real en navegador headless
+  mobile-warning.spec.js → test E2E: emula un móvil (iPhone 13) y comprueba el aviso
 playwright.config.js   → arranca el dev server y configura el navegador para el test E2E
 ```
 
@@ -79,7 +81,7 @@ playwright.config.js   → arranca el dev server y configura el navegador para e
 
 7. **Sin control de colisiones por mapa real ni capas de profundidad** (pendiente) más allá de un diccionario plano de paredes (`walls`) — no escala bien a mapas grandes ni a colisiones con objetos dinámicos.
 
-8. **Sin gestión de resolución/responsive.** (pendiente) El canvas es fijo a 352×198px y se escala con `transform: scale(3)` vía CSS; no se adapta a distintos tamaños de pantalla ni a móvil.
+8. **Sin gestión de resolución/responsive.** (pendiente) El canvas es fijo a 352×198px y se escala con `transform: scale(3)` vía CSS; no se adapta a distintos tamaños de pantalla ni a móvil. Mitigado parcialmente: hay un aviso (`src/MobileWarning.js`) que detecta dispositivos táctiles sin teclado físico y avisa que el juego está pensado para PC (ver sección 12), pero el juego en sí sigue sin ser jugable con controles táctiles.
 
 ## 5. Mejoras sugeridas (priorizadas)
 
@@ -95,7 +97,7 @@ playwright.config.js   → arranca el dev server y configura el navegador para e
 - ~~Implementar el sistema de batallas (ya hay arte preparado: `*Battle.png`, iconos chill/fungi/spicy/veggie, `SingleMemberDisplay.png`)~~ **Hecho (versión básica)**, ver sección 10. Falta: equipo de varias pizzas por bando, recompensas/consecuencias tras ganar o perder, más mapas de batalla y enemigos.
 - ~~Añadir persistencia (`localStorage` o backend) para guardar progreso.~~ **Hecho**, ver sección 11. Falta: persistir también el mapa actual si se añaden más mapas jugables, y un backend si en algún momento se quiere progreso multi-dispositivo.
 - Añadir un sistema de transición entre mapas (actualmente solo hay un mapa cargado, `Kitchen` está definida pero nunca se usa).
-- Soporte táctil/mobile (controles en pantalla) si se apunta a web/móvil.
+- ~~Soporte táctil/mobile.~~ Se evaluó construir un "modo móvil" completo (cruceta táctil, canvas responsive, capa de input táctil) y se descartó por ahora: coste alto (rehacer input + layout) para un proyecto de portfolio. En su lugar se implementó el aviso de la sección 12. El soporte táctil completo queda en el roadmap (sección 12) si en algún momento se decide invertir en ello.
 
 **Calidad de código:**
 - Introducir ESLint + Prettier.
@@ -133,6 +135,7 @@ Caminos razonables si se decide invertir tiempo en convertirlo en algo con poten
 - [x] Implementar sistema de batallas (versión básica 1 vs 1, ver sección 10)
 - [x] Añadir un test E2E (Playwright, ver sección 10)
 - [x] Añadir persistencia de progreso (`localStorage`, ver sección 11)
+- [x] Avisar en dispositivos móviles sin teclado; soporte táctil completo documentado como roadmap (ver sección 12)
 
 ## 9. Cambios aplicados en esta ronda
 
@@ -185,3 +188,25 @@ El tutorial original no cubre el combate en el punto donde estaba el código, as
 - Pruebas de lógica pura en Node (sin DOM) para `getTypeMultiplier`, `calculateDamage` y `Combatant` (multiplicadores x2/x0.5/x1, daño calculado, clamp de HP a 0, `isFainted`).
 - `vite build` exitoso (18 módulos transformados).
 - Test E2E real con Playwright (`tests/battle.spec.js`, `npm run test:e2e`): abre el juego en Chromium headless, mueve al héroe, habla con `npcC`, juega la batalla completa y comprueba HUD, daño, victoria y diálogo de cierre. Gracias a esta prueba se encontró y arregló un bug visual real (el HUD de batalla tapaba el nombre con la barra de HP porque `SingleMemberDisplay.png` es solo la ranura de la barra, no una placa de nombre completa).
+
+## 12. Soporte móvil: aviso implementado, controles táctiles en roadmap
+
+**Decisión:** el juego solo se controla con teclado (flechas/WASD + Enter) y el canvas tiene tamaño fijo escalado por CSS (`transform: scale(3)`), así que en un móvil o tablet sin teclado físico no es jugable. Se evaluaron dos opciones:
+
+1. Aviso simple que detecta el dispositivo y explica que el juego está pensado para PC.
+2. "Modo móvil" completo: cruceta táctil en pantalla, botón de acción, canvas responsive, y una capa de input nueva que no dependa de `KeyPressListener`/eventos de teclado.
+
+Se implementó la opción 1. La opción 2 se descartó **por ahora**: para un proyecto de portfolio basado en un tutorial, el coste (rehacer la capa de input y el layout, además de re-testear toda la UI de batalla en pantallas pequeñas) no se justifica frente al beneficio. Queda documentada aquí como roadmap si en el futuro se decide invertir en ello.
+
+**Implementado:**
+- `src/MobileWarning.js`: clase con el mismo patrón que `TextMessage`/`Battle` (`createElement()` + `init(container)`). Expone `MobileWarning.isLikelyMobile()`, que combina `matchMedia("(pointer: coarse)")` y `matchMedia("(hover: none)")` para detectar dispositivos táctiles sin ratón/teclado (un portátil con pantalla táctil pero con ratón no dispara el aviso).
+- `src/main.js`: si `isLikelyMobile()` es `true`, muestra el aviso superpuesto a todo el viewport (no dentro de `.game-container`, para no heredar el `transform: scale(3)`). El juego sigue cargado debajo; el aviso solo se puede cerrar con el botón "Entendido, continuar" (no se puede elegir un "modo móvil" real porque no existe todavía).
+- `public/styles/MobileWarning.css`: overlay fijo a pantalla completa con una tarjeta centrada, reutilizando las variables de color de `global.css`.
+- `tests/mobile-warning.spec.js`: dos tests E2E — uno emulando un iPhone 13 (`devices["iPhone 13"]` de Playwright) que comprueba que el aviso aparece y se puede cerrar, y otro en viewport de escritorio normal que comprueba que el aviso **no** aparece.
+
+**Roadmap si se decide construir el soporte táctil completo más adelante:**
+1. Sustituir el canvas de tamaño fijo (352×198px + `transform: scale(3)`) por un tamaño responsive (`ResizeObserver` + recalcular la escala en JS en vez de CSS fijo).
+2. Abstraer la entrada actual (`DirectionInput.js`, que escucha `keydown`/`keyup`) detrás de una interfaz común, para poder añadir una segunda implementación basada en una cruceta y un botón táctiles sin tocar `Person.js`/`Overworld.js`.
+3. Construir los controles táctiles en pantalla (cruceta direccional + botón de acción equivalente a "Enter"), visibles solo cuando `MobileWarning.isLikelyMobile()` es `true` y el usuario decide continuar.
+4. Revisar la UI de `Battle.css`/`TextMessage.css` en viewports pequeños (los botones de movimiento y el HUD están pensados para una ventana de escritorio).
+5. Extender los tests E2E de móvil para cubrir una partida completa con los controles táctiles, igual que ya se hace con teclado en `battle.spec.js`.

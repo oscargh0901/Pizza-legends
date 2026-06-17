@@ -30,7 +30,7 @@ npm run preview
 
 ## Tests
 
-Hay un test end-to-end (Playwright) que juega la partida real en un navegador headless: mueve al héroe, habla con el NPC retador, pelea la batalla y comprueba el resultado.
+Hay tests end-to-end (Playwright) que juegan la partida real en un navegador headless: mueven al héroe, hablan con el NPC retador, pelean la batalla y comprueban el resultado, además de comprobar el aviso de "modo móvil" emulando un iPhone.
 
 ```bash
 npx playwright install chromium   # solo la primera vez
@@ -53,6 +53,7 @@ src/               Código del motor (módulos ES)
   OverworldEvent.js / TextMessage.js   Cutscenes y diálogos
   Battle.js / Combatant.js / pizzas.js   Sistema de batallas por turnos
   Storage.js        Persistencia en localStorage (posición del héroe, enemigos derrotados)
+  MobileWarning.js  Aviso en dispositivos táctiles sin teclado físico
   DirectionInput.js / KeyPressListener.js   Entrada de teclado
   utils.js          Helpers de cuadrícula y eventos
 public/             Assets estáticos servidos tal cual (imágenes, CSS)
@@ -62,3 +63,5 @@ public/             Assets estáticos servidos tal cual (imágenes, CSS)
 
 - Flechas / WASD: moverse
 - Enter: hablar con un NPC / avanzar diálogo / luchar (al hablar con el NPC retador)
+
+El juego solo se controla con teclado. En un móvil o tablet sin teclado físico aparece un aviso indicándolo (no hay controles táctiles todavía).

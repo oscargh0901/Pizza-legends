@@ -36,6 +36,7 @@ src/               Código del motor (módulos ES)
   GameObject.js / Person.js   Entidades del juego
   Sprite.js         Animación de sprites
   OverworldEvent.js / TextMessage.js   Cutscenes y diálogos
+  Battle.js / Combatant.js / pizzas.js   Sistema de batallas por turnos
   DirectionInput.js / KeyPressListener.js   Entrada de teclado
   utils.js          Helpers de cuadrícula y eventos
 public/             Assets estáticos servidos tal cual (imágenes, CSS)
@@ -44,4 +45,4 @@ public/             Assets estáticos servidos tal cual (imágenes, CSS)
 ## Controles
 
 - Flechas / WASD: moverse
-- Enter: hablar con un NPC / avanzar diálogo
+- Enter: hablar con un NPC / avanzar diálogo / luchar (al hablar con el NPC retador)

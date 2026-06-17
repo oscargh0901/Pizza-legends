@@ -44,6 +44,20 @@ export const OverworldMaps = {
           { type: "walk",  direction: "down" },
         ]
       }),
+      npcC: new Person({
+        x: utils.withGrid(5),
+        y: utils.withGrid(9),
+        src: "/images/characters/people/npc3.png",
+        talking: [
+          {
+            events: [
+              { type: "textMessage", text: "I challenge you to a pizza battle!", faceHero: "npcC" },
+              { type: "battle", enemyId: "npcC" },
+              { type: "textMessage", text: "Until next time!" },
+            ]
+          }
+        ]
+      }),
     },
     walls: {
       [utils.asGridCoord(7,6)] : true,

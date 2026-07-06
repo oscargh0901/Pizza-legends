@@ -2,7 +2,7 @@ export class KeyPressListener {
     constructor(keyCode, callback) {
         let keySafe = true;
         this.keydownFunction = function(event) {
-            if (event.code == keyCode) {
+            if (event.code == keyCode && keySafe) {
                 keySafe = false;
                 callback();
             }

@@ -2,7 +2,7 @@
 
 Prototipo de un RPG estilo Pokémon (vista cenital, movimiento por cuadrícula, NPCs, diálogos) hecho en JavaScript vanilla + Canvas 2D.
 
-Ver [`CLAUDE.md`](./CLAUDE.md) para un escaneo completo del proyecto: arquitectura, bugs conocidos, mejoras pendientes y proyección de negocio.
+Ver [`CLAUDE.md`](./CLAUDE.md) para la documentación técnica: arquitectura, decisiones de diseño, bugs corregidos y roadmap.
 
 ## Origen
 

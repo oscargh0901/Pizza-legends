@@ -1,6 +1,6 @@
-# CLAUDE.md — Escaneo del proyecto "Pizza Legends"
+# CLAUDE.md — Documentación técnica de "Pizza Legends"
 
-> Documento de referencia generado a partir de un escaneo completo del repositorio (código, assets, historial git). Pensado para que cualquier persona (o agente) que retome el proyecto entienda en qué estado está, qué arreglar y hacia dónde podría evolucionar.
+> Notas de arquitectura, decisiones tomadas, bugs encontrados y roadmap. Punto de referencia para retomar el proyecto o entender qué se construyó y por qué.
 
 ## 1. Resumen ejecutivo
 
@@ -8,7 +8,7 @@
 
 El repo cubre la parte de **"overworld"** (mapa explorable, movimiento del héroe, NPCs con comportamiento en bucle, cutscenes de diálogo), un **sistema de batallas por turnos básico** (1 vs 1, sin equipo/colección de "pizzas" más allá de un combatiente por bando, sin menús) y ahora también **persistencia de progreso en `localStorage`** (posición del héroe y enemigos derrotados sobreviven a un recargo de página), usando los assets que ya estaban en `images/` (fondos de batalla, iconos de tipos de pizza, displays de combate) pero que hasta ahora no se usaban. Sigue siendo un proyecto **a medio terminar** (sin progresión real, sin colección de pizzas, sin recompensas), consistente con seguir un tutorial paso a paso y extenderlo con mecánicas propias.
 
-Historial de commits (`git log`): `Initial commit` → `a` → `afinal`. Mensajes no descriptivos, típico de quien copia un tutorial sin documentar avances propios.
+Los commits originales del tutorial tenían mensajes no descriptivos (`Initial commit`, `a`, `afinal`); los commits propios del proyecto sí documentan los cambios.
 
 ## 2. ¿De qué va el juego?
 
@@ -85,7 +85,7 @@ playwright.config.js   → arranca el dev server y configura el navegador para e
 
 ## 5. Mejoras sugeridas (priorizadas)
 
-**Críticas (antes de seguir construyendo encima):** ✅ hechas en esta ronda
+**Críticas (antes de seguir construyendo encima):** ✅ hechas en este proyecto
 - ~~Arreglar `KeyPressListener.unbind()` (cambiar a `removeEventListener`).~~
 - ~~Quitar los `console.log` de depuración.~~
 - ~~Añadir `package.json` + un bundler ligero (Vite) para poder usar módulos ES (`import`/`export`) en vez de variables globales y `<script>` en orden manual.~~
@@ -137,7 +137,7 @@ Caminos razonables si se decide invertir tiempo en convertirlo en algo con poten
 - [x] Añadir persistencia de progreso (`localStorage`, ver sección 11)
 - [x] Avisar en dispositivos móviles sin teclado; soporte táctil completo documentado como roadmap (ver sección 12)
 
-## 9. Cambios aplicados en esta ronda
+## 9. Cambios aplicados
 
 - `KeyPressListener.unbind()` ahora usa `removeEventListener` (antes duplicaba listeners en cada diálogo cerrado).
 - Eliminados los `console.log` de depuración en `GameObject.js` y `OverworldMap.js`.
@@ -147,11 +147,11 @@ Caminos razonables si se decide invertir tiempo en convertirlo en algo con poten
 - Datos de mapas (`DemoRoom`, `Kitchen`) separados del motor en `src/maps.js`; `OverworldMap.js` ahora solo contiene la clase.
 - `index.html` simplificado a un único `<script type="module" src="/src/main.js">` en vez de 11 `<script>` en orden manual.
 - Añadidos `README.md` y `.gitignore`.
-- Verificado con `npm run build` (15 módulos transformados sin error) y con el dev server de Vite (`index.html`, `/src/main.js`, imágenes y CSS responden 200, sin errores de resolución de imports). No se pudo abrir un navegador real en este entorno (sin acceso de red para descargar el binario headless), así que falta una verificación visual manual del juego en ejecución.
+- Verificado con `npm run build` (sin errores) y con el dev server de Vite (todos los assets responden 200, sin errores de resolución de imports). Verificación visual realizada en Chromium headless vía Playwright (ver sección 10).
 
 Todos los puntos del checklist (sección 8) están resueltos a fecha de esta ronda.
 
-## 10. Sistema de batallas (añadido en esta ronda)
+## 10. Sistema de batallas (añadido)
 
 El tutorial original no cubre el combate en el punto donde estaba el código, así que esta es una mecánica **diseñada e implementada desde cero** para esta extensión, reutilizando el arte que ya estaba en el repo sin usar.
 
@@ -170,7 +170,7 @@ El tutorial original no cubre el combate en el punto donde estaba el código, as
 - No hay recompensas tras ganar (ni XP ni objetos); solo se recuerda que `npcC` ya fue derrotado (ver sección 11) para no repetir la batalla.
 - Solo hay un enemigo y un fondo de batalla (`DemoBattle.png`); los demás fondos de batalla (`KitchenBattle.png`, `StreetBattle.png`, etc.) siguen sin usarse.
 
-## 11. Persistencia de progreso (añadido en esta ronda)
+## 11. Persistencia de progreso (añadido)
 
 `src/Storage.js` envuelve `localStorage` en un único objeto serializado bajo la key `pizzaLegendsSave` (`JSON.parse`/`JSON.stringify`), con una API mínima: `getHeroPosition()`/`setHeroPosition(x, y)` y `isDefeated(enemyId)`/`markDefeated(enemyId)`.
 

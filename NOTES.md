@@ -1,4 +1,4 @@
-# CLAUDE.md — Documentación técnica de "Pizza Legends"
+# Notas técnicas de "Pizza Legends"
 
 > Notas de arquitectura, decisiones tomadas, bugs encontrados y roadmap. Punto de referencia para retomar el proyecto o entender qué se construyó y por qué.
 

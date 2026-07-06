@@ -39,7 +39,7 @@ src/                   → código del motor, en módulos ES (import/export)
   main.js               → punto de entrada, instancia Overworld
   Overworld.js          → bucle de juego (game loop), cámara, draw order
   OverworldMap.js       → clase del motor: paredes, cutscenes (sin datos de contenido)
-  maps.js               → datos de mapas (DemoRoom, Kitchen), separados del motor
+  maps.js               → datos de mapas (DemoRoom), separados del motor
   OverworldEvent.js     → ejecuta eventos de cutscene (walk, stand, textMessage)
   GameObject.js         → clase base de entidades (posición, sprite, behaviorLoop)
   Person.js             → extiende GameObject con movimiento por input/cuadrícula
@@ -96,7 +96,7 @@ playwright.config.js   → arranca el dev server y configura el navegador para e
 **Funcionales (para que sea un juego real):**
 - ~~Implementar el sistema de batallas (ya hay arte preparado: `*Battle.png`, iconos chill/fungi/spicy/veggie, `SingleMemberDisplay.png`)~~ **Hecho (versión básica)**, ver sección 10. Falta: equipo de varias pizzas por bando, recompensas/consecuencias tras ganar o perder, más mapas de batalla y enemigos.
 - ~~Añadir persistencia (`localStorage` o backend) para guardar progreso.~~ **Hecho**, ver sección 11. Falta: persistir también el mapa actual si se añaden más mapas jugables, y un backend si en algún momento se quiere progreso multi-dispositivo.
-- Añadir un sistema de transición entre mapas (actualmente solo hay un mapa cargado, `Kitchen` está definida pero nunca se usa).
+- Añadir más mapas y un sistema de transición entre ellos (actualmente solo existe `DemoRoom`).
 - ~~Soporte táctil/mobile.~~ Se evaluó construir un "modo móvil" completo (cruceta táctil, canvas responsive, capa de input táctil) y se descartó por ahora: coste alto (rehacer input + layout) para un proyecto de portfolio. En su lugar se implementó el aviso de la sección 12. El soporte táctil completo queda en el roadmap (sección 12) si en algún momento se decide invertir en ello.
 
 **Calidad de código:**
